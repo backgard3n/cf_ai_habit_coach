@@ -8,14 +8,6 @@ Users can:
 - Log habit completions
 - See lightweight stats for the last 7 days
 - Ask an AI coach for feedback and suggestions based on their data
-
-This project is designed to satisfy the Cloudflare AI internship assignment:
-
-- ✅ LLM – Workers AI model `@cf/meta/llama-3.3-70b-instruct-fp8-fast`
-- ✅ Workflow / coordination – Worker + Durable Object orchestrate state and AI calls
-- ✅ User input – Web chat UI + habit controls
-- ✅ Memory / state – Per-user habit + log storage in a Durable Object
-
 ---
 
 ## Tech Stack

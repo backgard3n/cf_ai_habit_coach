@@ -1,7 +1,7 @@
 {
   "name": "cf_ai_habit_coach",
   "version": "1.0.0",
-  "description": "AI-powered habit tracker and coach on Cloudflare Workers AI + Durable Objects",
+  "description": "AI-powered habit tracker and coach on Cloudflare Workers AI + Durable Objects - By Jack Jardine for Summer Internship 2026",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
