@@ -4,7 +4,6 @@
   "main": "src/worker.ts",
   "compatibility_date": "2025-11-01",
 
-  // Serve static UI from ./public
   "assets": {
     "directory": "public"
   },
@@ -25,7 +24,7 @@
   "migrations": [
     {
       "tag": "v1",
-      "new_classes": ["HabitStore"]
+      "new_sqlite_classes": ["HabitStore"]
     }
   ]
 }
