@@ -5,7 +5,7 @@ export interface Env {
     run(
       model: string,
       options: { prompt: string; stream?: boolean }
-    ): Promise<string>;
+    ): Promise<any>; // We treat the result as "any" and extract text ourselves
   };
   HABIT_STORE: DurableObjectNamespace;
 }
@@ -40,7 +40,7 @@ function defaultState(): UserState {
 }
 
 function uuid(): string {
-  // Simple UUID-ish helper; good enough for this project
+  // Simple UUID helper; good enough for this project
   return crypto.randomUUID();
 }
 
@@ -102,12 +102,14 @@ export class HabitStore implements DurableObject {
     const path = url.pathname; // will be /api/... here
 
     try {
+      // GET /api/state – return full state + stats
       if (request.method === "GET" && path === "/api/state") {
         const state = await this.loadState();
         const stats = computeStats(state);
         return Response.json({ state, stats });
       }
 
+      // POST /api/habits – create a new habit
       if (request.method === "POST" && path === "/api/habits") {
         const body = (await request.json()) as {
           name?: string;
@@ -143,6 +145,7 @@ export class HabitStore implements DurableObject {
         return Response.json({ habit: newHabit, state, stats });
       }
 
+      // POST /api/log – log a habit completion
       if (request.method === "POST" && path === "/api/log") {
         const body = (await request.json()) as { habitId?: string };
         if (!body.habitId) {
@@ -169,6 +172,7 @@ export class HabitStore implements DurableObject {
         return Response.json({ log, state, stats });
       }
 
+      // POST /api/coach – AI coaching based on stats + user question
       if (request.method === "POST" && path === "/api/coach") {
         const body = (await request.json()) as { message?: string };
         const userMessage = (body.message || "").trim();
@@ -212,15 +216,37 @@ User's question or message:
 "${userMessage}"
 `.trim();
 
-        const aiResponse = await this.env.AI.run(
+        const raw = await this.env.AI.run(
           "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-          {
-            prompt: systemPrompt
-          }
+          { prompt: systemPrompt }
         );
 
+        // Extract a plain string from the Workers AI response
+        let replyText: string;
+
+        if (typeof raw === "string") {
+          replyText = raw;
+        } else if (raw && typeof raw === "object") {
+          // Common Workers AI format: { response: "..." }
+          if ("response" in raw && typeof (raw as any).response === "string") {
+            replyText = (raw as any).response;
+          }
+          // Some variants: { output_text: "..." }
+          else if (
+            "output_text" in raw &&
+            typeof (raw as any).output_text === "string"
+          ) {
+            replyText = (raw as any).output_text;
+          } else {
+            // Fallback: JSON stringify, so at least it's readable
+            replyText = JSON.stringify(raw);
+          }
+        } else {
+          replyText = "Sorry, I couldn't generate a response.";
+        }
+
         return Response.json({
-          reply: aiResponse,
+          reply: replyText,
           stats
         });
       }
@@ -237,17 +263,19 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
+    // Static assets are served by the "assets" config.
+    // All /api/* requests get routed to the Durable Object.
     if (!url.pathname.startsWith("/api/")) {
       return new Response("Not found", { status: 404 });
     }
 
-    // Get userId from query string; frontend keeps it in localStorage
+    // userId comes from query param; frontend stores it in localStorage
     const userId = url.searchParams.get("userId") || "anonymous";
 
     const id = env.HABIT_STORE.idFromName(userId);
     const stub = env.HABIT_STORE.get(id);
 
-    // Forward the original request to the Durable Object
+    // Forward original request (same URL and body) to the Durable Object
     return stub.fetch(request);
   }
 };
