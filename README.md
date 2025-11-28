@@ -1,4 +1,4 @@
-# Edge Habit Coach (`cf_ai_habit_coach`)
+# Habit Coach (`cf_ai_habit_coach`)
 
 An AI-powered habit tracker and coach built on **Cloudflare Workers**, **Workers AI**, and **Durable Objects**.
 
