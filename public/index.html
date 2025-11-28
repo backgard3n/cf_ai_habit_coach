@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Edge Habit Coach</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="app-header">
+        <h1>Edge Habit Coach</h1>
+        <p>AI-powered habit tracker running on Cloudflare Workers AI</p>
+      </header>
+
+      <main class="app-main">
+        <section class="panel panel-left">
+          <h2>Your Habits</h2>
+
+          <form id="habit-form" class="card">
+            <h3>Create a new habit</h3>
+            <label>
+              Habit name
+              <input
+                type="text"
+                id="habit-name"
+                placeholder="e.g. Read 20 minutes"
+                required
+              />
+            </label>
+
+            <div class="two-col">
+              <label>
+                Frequency
+                <select id="habit-frequency">
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                </select>
+              </label>
+
+              <label>
+                Target per period
+                <input
+                  type="number"
+                  id="habit-target"
+                  min="1"
+                  step="1"
+                  value="1"
+                  required
+                />
+              </label>
+            </div>
+
+            <label>
+              Period
+              <select id="habit-period">
+                <option value="day">Per day</option>
+                <option value="week">Per week</option>
+              </select>
+            </label>
+
+            <button type="submit">Add habit</button>
+          </form>
+
+          <div id="habit-list" class="card">
+            <h3>Current habits</h3>
+            <div id="habit-items"></div>
+          </div>
+        </section>
+
+        <section class="panel panel-right">
+          <h2>AI Coach</h2>
+          <div id="chat-window" class="card chat-window">
+            <div id="chat-messages"></div>
+          </div>
+
+          <form id="chat-form" class="chat-input-row">
+            <input
+              type="text"
+              id="chat-input"
+              placeholder="Ask your coach anything: e.g. “How am I doing this week?”"
+              autocomplete="off"
+              required
+            />
+            <button type="submit">Send</button>
+          </form>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <small>
+          Built for Cloudflare AI internship assignment –
+          LLM: @cf/meta/llama-3.3-70b-instruct-fp8-fast
+        </small>
+      </footer>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
