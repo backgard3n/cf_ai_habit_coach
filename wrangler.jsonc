@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "cf_ai_habit_coach",
+  "name": "habit0coach",
   "main": "src/worker.ts",
   "compatibility_date": "2025-11-01",
 
